@@ -19,7 +19,8 @@ import {
   Settings, 
   HelpCircle,
   Sparkles,
-  Info
+  Info,
+  Apple
 } from "lucide-react";
 import { IOSBuild, APIResponse } from "./types";
 import { parseBuildInfo, formatBuildDate } from "./utils";
@@ -200,11 +201,11 @@ export default function App() {
           className="flex items-center gap-3 mb-2"
         >
           <div className="bg-sky-500/10 p-2.5 rounded-2xl border border-sky-400/20">
-            <Smartphone className="w-8 h-8 text-sky-400" />
+            <Apple className="w-8 h-8 text-sky-400" />
           </div>
-          <span className="text-xs tracking-[0.3em] text-sky-400 font-bold uppercase font-mono bg-sky-950/40 px-3 py-1 rounded-full border border-sky-900/40">
+          {/* <span className="text-xs tracking-[0.3em] text-sky-400 font-bold uppercase font-mono bg-sky-950/40 px-3 py-1 rounded-full border border-sky-900/40">
             Internal Beta
-          </span>
+          </span> */}
         </motion.div>
 
         <motion.h1 
@@ -276,13 +277,13 @@ export default function App() {
               <span className="hidden sm:inline">Options</span>
             </button>
 
-            <button
+            {/* <button
               onClick={() => setShowAddModal(true)}
               className="p-2.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 rounded-xl border border-sky-500/30 font-medium text-sm flex items-center gap-1.5 hover:border-sky-400 transition-all active:scale-95"
             >
               <Plus className="w-4.5 h-4.5" />
               <span className="hidden sm:inline">Mock Build</span>
-            </button>
+            </button> */}
           </div>
         </motion.div>
 
