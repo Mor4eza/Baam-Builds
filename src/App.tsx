@@ -60,7 +60,7 @@ export default function App() {
       const json: APIResponse = await res.json();
       
       if (json.success && json.data) {
-        setBuilds(json.data);
+        setBuilds([...json.data].reverse());
         setIsFallback(json.isFallback || false);
         if (json.isFallback) {
           console.log("Fetched fallback data:", json.error);
@@ -396,7 +396,7 @@ export default function App() {
                       "desc": "Download HamrahBaam_4.6.4_b2-develop.ipa",
                       "plistUrl": "manifest_4.6.4_b2-develop.plist"
                     }
-                  ]);
+                  ].reverse());
                   setError(null);
                   setIsFallback(true);
                 }}
