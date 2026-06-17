@@ -22,7 +22,7 @@ const FALLBACK_VERSIONS = [
 ];
 
 // API endpoint to fetch versions and proxy them safely to avoid CORS issues
-app.get("/api/versions", async (req, res) => {
+app.get("/data/versions", async (req, res) => {
   try {
     const response = await fetch("https://iosbaam.ir/test/versions.json", {
       headers: {

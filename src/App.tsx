@@ -55,7 +55,7 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/versions" + (force ? "?force=true" : ""));
+      const res = await fetch("/data/versions" + (force ? "?force=true" : ""));
       const json: APIResponse = await res.json();
       
       if (json.success && json.data) {
