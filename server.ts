@@ -24,7 +24,7 @@ const FALLBACK_VERSIONS = [
 // API endpoint to fetch versions and proxy them safely to avoid CORS issues
 app.get("/data/versions", async (req, res) => {
   try {
-    const response = await fetch("https://iosbaam.ir/test/versions.json", {
+    const response = await fetch("https://iosbaam.ir/beta/versions.json", {
       headers: {
         "Accept": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) iOS Beta Dist Engine"
@@ -44,7 +44,7 @@ app.get("/data/versions", async (req, res) => {
       isFallback: false
     });
   } catch (error: any) {
-    console.warn("Proxy fetch to https://iosbaam.ir/test/versions.json failed, serving fallback data. Error:", error.message || error);
+    console.warn("Proxy fetch to https://iosbaam.ir/beta/versions.json failed, serving fallback data. Error:", error.message || error);
     res.json({
       success: true,
       data: FALLBACK_VERSIONS,

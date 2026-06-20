@@ -201,12 +201,12 @@ export default function App() {
 
   // Handle direct OTA trigger URL
   const triggerInstall = (build: IOSBuild) => {
-    const installUrl = `itms-services://?action=download-manifest&url=https://iosbaam.ir/test/${build.plistUrl}`;
+    const installUrl = `itms-services://?action=download-manifest&url=https://iosbaam.ir/beta/${build.plistUrl}`;
     window.location.href = installUrl;
   };
 
   const getFullInstallUrl = (plistUrl: string) => {
-    return `itms-services://?action=download-manifest&url=https://iosbaam.ir/test/${plistUrl}`;
+    return `itms-services://?action=download-manifest&url=https://iosbaam.ir/beta/${plistUrl}`;
   };
 
   return (
@@ -331,7 +331,7 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center py-2 border-b border-slate-800/50 gap-1.5">
                   <div>
                     <span className="text-slate-300 font-medium">Source Server URL</span>
-                    <p className="text-slate-500 text-xs font-mono mt-0.5">https://iosbaam.ir/test/versions.json</p>
+                    <p className="text-slate-500 text-xs font-mono mt-0.5">https://iosbaam.ir/beta/versions.json</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`inline-block w-2 h-2 rounded-full ${isFallback ? "bg-amber-500" : "bg-emerald-500 animate-pulse"}`}></span>
@@ -641,7 +641,7 @@ export default function App() {
       <footer className="relative z-10 w-full max-w-2xl text-center py-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-550 select-text">
         <p>© {new Date().getFullYear()} Baam iOS Group.</p>
         <div className="flex gap-4">
-          <a href="https://iosbaam.ir/test/versions.json" target="_blank" rel="noreferrer" className="hover:text-slate-300 flex items-center gap-1 transition-colors">
+          <a href="https://iosbaam.ir/beta/versions.json" target="_blank" rel="noreferrer" className="hover:text-slate-300 flex items-center gap-1 transition-colors">
             Raw JSON API <ExternalLink className="w-3 h-3" />
           </a>
         </div>
@@ -664,8 +664,8 @@ export default function App() {
             {(() => {
               const parsed = parseBuildInfo(selectedBuild);
               const installUrl = getFullInstallUrl(selectedBuild.plistUrl);
-              const ipaDirectUrl = `https://iosbaam.ir/test/${parsed.ipaFilename}`;
-              const plistDirectUrl = `https://iosbaam.ir/test/${selectedBuild.plistUrl}`;
+              const ipaDirectUrl = `https://iosbaam.ir/beta/${parsed.ipaFilename}`;
+              const plistDirectUrl = `https://iosbaam.ir/beta/${selectedBuild.plistUrl}`;
               // Build standard QR api parameters (URL encoded)
               const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(installUrl)}&color=00a2ff&bgcolor=0c1424`;
 
