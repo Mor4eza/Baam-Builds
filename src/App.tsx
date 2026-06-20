@@ -13,8 +13,7 @@ import {
   Check, 
   X, 
   ChevronDown, 
-  ChevronUp, 
-  Smartphone, 
+  ChevronUp,
   Plus, 
   Settings, 
   HelpCircle,
@@ -43,6 +42,11 @@ export default function App() {
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showHelpAccordion, setShowHelpAccordion] = useState<boolean>(true);
   const [showConfigPanel, setShowConfigPanel] = useState<boolean>(false);
+
+  // Deletion with password protection states
+  const [pendingDeleteBuild, setPendingDeleteBuild] = useState<IOSBuild | null>(null);
+  const [deletePassword, setDeletePassword] = useState<string>("");
+  const [deletePasswordError, setDeletePasswordError] = useState<string | null>(null);
 
   // Custom Form states for simulated builds
   const [newTitle, setNewTitle] = useState("");
@@ -142,6 +146,28 @@ export default function App() {
   const handleClearAllSimulated = () => {
     setSimulatedBuilds([]);
     localStorage.removeItem("baam_simulated_builds");
+  };
+
+  const confirmDeletion = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    if (deletePassword === "iosbaam" || "iostester") {
+      if (pendingDeleteBuild) {
+        const isSimulated = simulatedBuilds.some(b => b.plistUrl === pendingDeleteBuild.plistUrl);
+        if (isSimulated) {
+          handleDeleteSimulatedBuild(pendingDeleteBuild.plistUrl);
+        } else {
+          const parsed = parseBuildInfo(pendingDeleteBuild);
+          handleHideBuild(pendingDeleteBuild.plistUrl, parsed.title);
+        }
+      }
+      setPendingDeleteBuild(null);
+      setDeletePassword("");
+      setDeletePasswordError(null);
+    } else {
+      setDeletePasswordError("Incorrect password. Please try again.");
+    }
   };
 
   const copyToClipboard = (text: string, label: string) => {
@@ -494,11 +520,9 @@ export default function App() {
                         {/* Trash Can Delete Button - Matches the garbage icon in the screenshot */}
                         <button
                           onClick={() => {
-                            if (isSimulated) {
-                              handleDeleteSimulatedBuild(build.plistUrl);
-                            } else {
-                              handleHideBuild(build.plistUrl, parsed.title);
-                            }
+                            setPendingDeleteBuild(build);
+                            setDeletePassword("");
+                            setDeletePasswordError(null);
                           }}
                           aria-label={`Delete build ${parsed.title}`}
                           className="p-2 justify-center bg-slate-900/60 hover:bg-red-950/40 text-slate-400 hover:text-red-400 rounded-xl border border-slate-800 hover:border-red-900/30 transition-all cursor-pointer active:scale-95"
@@ -615,7 +639,7 @@ export default function App() {
 
       {/* FOOTER */}
       <footer className="relative z-10 w-full max-w-2xl text-center py-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-550 select-text">
-        <p>© {new Date().getFullYear()} Baam Beta Distribution Centre.</p>
+        <p>© {new Date().getFullYear()} Baam iOS Group.</p>
         <div className="flex gap-4">
           <a href="https://iosbaam.ir/test/versions.json" target="_blank" rel="noreferrer" className="hover:text-slate-300 flex items-center gap-1 transition-colors">
             Raw JSON API <ExternalLink className="w-3 h-3" />
@@ -891,6 +915,111 @@ export default function App() {
         )}
       </AnimatePresence>
 
+ {/* --- MODAL 3: PASSWORD PROMPT FOR DELETING A VERSION --- */}
+      <AnimatePresence>
+        {pendingDeleteBuild && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                setPendingDeleteBuild(null);
+                setDeletePassword("");
+                setDeletePasswordError(null);
+              }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+
+            {/* Dialog Form Container */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-[#0c1424] border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl p-6 sm:p-8"
+            >
+              <div className="flex justify-between items-center mb-5">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center border border-red-500/15">
+                    <Trash2 className="w-4 h-4 text-red-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Security Verification</h3>
+                    <p className="text-slate-500 text-xs">Enter password to delete this build</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    setPendingDeleteBuild(null);
+                    setDeletePassword("");
+                    setDeletePasswordError(null);
+                  }}
+                  className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="mb-4 bg-slate-900/60 p-3.5 rounded-xl border border-slate-850">
+                <p className="text-xs text-slate-400">Target Build:</p>
+                <p className="text-sm font-semibold text-sky-400 mt-0.5">{parseBuildInfo(pendingDeleteBuild).title}</p>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">Version {parseBuildInfo(pendingDeleteBuild).version} ({parseBuildInfo(pendingDeleteBuild).buildNum})</p>
+              </div>
+
+              <form onSubmit={confirmDeletion} className="space-y-4 text-sm text-slate-200">
+                
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 font-mono uppercase">Password</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter security password"
+                    value={deletePassword}
+                    onChange={(e) => {
+                      setDeletePassword(e.target.value);
+                      if (deletePasswordError) setDeletePasswordError(null);
+                    }}
+                    autoFocus
+                    className="w-full bg-slate-950/70 border border-slate-850 rounded-xl px-3.5 py-2.5 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/20 focus:outline-none transition-all duration-200 text-white font-sans"
+                  />
+                  {deletePasswordError && (
+                    <motion.p 
+                       initial={{ opacity: 0, y: -5 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       className="text-red-400 text-xs mt-1.5 font-medium flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {deletePasswordError}
+                    </motion.p>
+                  )}
+                </div>
+
+                <div className="pt-3 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPendingDeleteBuild(null);
+                      setDeletePassword("");
+                      setDeletePasswordError(null);
+                    }}
+                    className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl border border-slate-850 font-bold transition-all text-xs uppercase cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-3 text-white rounded-xl font-bold transition-all text-xs uppercase shadow-lg shadow-red-500/10 hover:shadow-red-500/20 bg-red-650 hover:bg-red-600 cursor-pointer"
+                  >
+                    Verify & Delete
+                  </button>
+                </div>
+
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
