@@ -47,6 +47,8 @@ export default function App() {
   const [pendingDeleteBuild, setPendingDeleteBuild] = useState<IOSBuild | null>(null);
   const [deletePassword, setDeletePassword] = useState<string>("");
   const [deletePasswordError, setDeletePasswordError] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Custom Form states for simulated builds
   const [newTitle, setNewTitle] = useState("");
@@ -148,12 +150,26 @@ export default function App() {
     localStorage.removeItem("baam_simulated_builds");
   };
 
-  const confirmDeletion = (e?: React.FormEvent) => {
+  const confirmDeletion = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
     }
     if (deletePassword === "iosbaam" || "iostester") {
-      if (pendingDeleteBuild) {
+      if (!pendingDeleteBuild) return;
+
+      setDeleteLoading(true);
+      setDeletePasswordError(null);
+
+      try {
+        // Use plistUrl as the unique tracker / build id for deletion
+        const buildId = pendingDeleteBuild.id;
+        const res = await fetch(`/api/version/${encodeURIComponent(buildId)}`, {
+          method: "DELETE"
+        });
+
+        const data = await res.json();
+
+        // Process actual deletion or hide in current view state
         const isSimulated = simulatedBuilds.some(b => b.plistUrl === pendingDeleteBuild.plistUrl);
         if (isSimulated) {
           handleDeleteSimulatedBuild(pendingDeleteBuild.plistUrl);
@@ -161,10 +177,20 @@ export default function App() {
           const parsed = parseBuildInfo(pendingDeleteBuild);
           handleHideBuild(pendingDeleteBuild.plistUrl, parsed.title);
         }
-      }
+      
+       // Show Success dialog
+        setSuccessMessage(data.message || "Version Deleted Successfully");
+
+        // Clean password and pending state values
       setPendingDeleteBuild(null);
       setDeletePassword("");
       setDeletePasswordError(null);
+      } catch (err: any) {
+        console.error("Deletion API failed:", err);
+        setDeletePasswordError(err.message || "Something went wrong during deletion.");
+      } finally {
+        setDeleteLoading(false);
+      }
     } else {
       setDeletePasswordError("Incorrect password. Please try again.");
     }
@@ -997,20 +1023,29 @@ export default function App() {
                 <div className="pt-3 flex gap-3">
                   <button
                     type="button"
+                    disabled={deleteLoading}
                     onClick={() => {
                       setPendingDeleteBuild(null);
                       setDeletePassword("");
                       setDeletePasswordError(null);
                     }}
-                    className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl border border-slate-850 font-bold transition-all text-xs uppercase cursor-pointer"
+                    className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl border border-slate-850 font-bold transition-all text-xs uppercase cursor-pointer disabled:opacity-40"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 text-white rounded-xl font-bold transition-all text-xs uppercase shadow-lg shadow-red-500/10 hover:shadow-red-500/20 bg-red-650 hover:bg-red-600 cursor-pointer"
+                    disabled={deleteLoading}
+                    className="flex-1 py-3 text-white rounded-xl font-bold transition-all text-xs uppercase shadow-lg shadow-red-500/10 hover:shadow-red-500/20 bg-red-650 hover:bg-red-600 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
                   >
-                    Verify & Delete
+                     {deleteLoading ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      "Verify & Delete"
+                    )}
                   </button>
                 </div>
 
@@ -1019,6 +1054,45 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* --- MODAL 4: DELETION SUCCESS DIALOG --- */}
+      <AnimatePresence>
+        {successMessage && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSuccessMessage(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+
+            {/* Dialog Container */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-[#0c1424] border border-slate-800 rounded-3xl w-full max-w-sm overflow-hidden relative shadow-2xl p-6 sm:p-8 text-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-5">
+                <Check className="w-8 h-8 stroke-[2.5]" />
+              </div>
+
+              <h3 className="text-xl font-bold text-white mb-2">Success</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-6">{successMessage}</p>
+
+              <button
+                onClick={() => setSuccessMessage(null)}
+                className="w-full py-3 bg-[#00a3ff] hover:bg-[#1bb0ff] text-white rounded-xl font-bold transition-all text-xs uppercase shadow-lg shadow-sky-500/10 hover:shadow-sky-500/20 cursor-pointer"
+              >
+                Done
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
