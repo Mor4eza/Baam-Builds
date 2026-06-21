@@ -201,12 +201,12 @@ export default function App() {
 
   // Handle direct OTA trigger URL
   const triggerInstall = (build: IOSBuild) => {
-    const installUrl = `itms-services://?action=download-manifest&url=https://iosbaam.ir/beta/${build.plistUrl}`;
+    const installUrl = `itms-services://?action=download-manifest&url=${build.plistUrl}`;
     window.location.href = installUrl;
   };
 
   const getFullInstallUrl = (plistUrl: string) => {
-    return `itms-services://?action=download-manifest&url=https://iosbaam.ir/beta/${plistUrl}`;
+    return `itms-services://?action=download-manifest&url=${plistUrl}`;
   };
 
   return (
@@ -342,7 +342,7 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center py-2 border-b border-slate-800/50 gap-2">
                   <div>
                     <span className="text-slate-300 font-medium">Clear / Reset Hidden Items</span>
-                    <p className="text-slate-500 text-xs mt-0.5">Restore any builds that were hidden using the garbage icon ({hiddenBuilds.length} hidden)</p>
+                    <p className="text-slate-500 text-xs mt-0.5">Restore any builds that were hidden us ing the garbage icon ({hiddenBuilds.length} hidden)</p>
                   </div>
                   <button
                     onClick={handleResetHidden}
@@ -504,8 +504,8 @@ export default function App() {
                         
                         {/* Subtitle with dynamic parsing */}
                         <div className="flex items-center text-base sm:text-lg text-slate-400">
-                          <span className="font-medium text-white">Version {parsed.version}</span>
-                          <span className="text-slate-400/80 font-normal ml-1">({parsed.buildNum})</span>
+                          <span className="font-medium text-white">Version {build.version}</span>
+                          <span className="text-slate-400/80 font-normal ml-1">B{build.build}</span>
                         </div>
                       </div>
 
@@ -532,10 +532,9 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Quick description line */}
                     <p className="text-xs text-slate-500 font-mono mb-6 pb-2 border-b border-slate-800/40 flex items-center gap-1">
-                      <span className="text-sky-400/70">{parsed.ipaFilename ? "IPA file: " : "Manifest URL: "}</span>
-                      <span className="text-slate-400">{parsed.ipaFilename || build.plistUrl}</span>
+                      {/* <span className="text-sky-400/70">{parsed.ipaFilename ? "IPA file: " : "Manifest URL: "}</span> */}
+                      {/* <span className="text-slate-400">{parsed.ipaFilename || build.plistUrl}</span> */}
                     </p>
 
                     {/* Main Interaction - Install button matching screenshot fully */}
@@ -664,10 +663,10 @@ export default function App() {
             {(() => {
               const parsed = parseBuildInfo(selectedBuild);
               const installUrl = getFullInstallUrl(selectedBuild.plistUrl);
-              const ipaDirectUrl = `https://iosbaam.ir/beta/${parsed.ipaFilename}`;
-              const plistDirectUrl = `https://iosbaam.ir/beta/${selectedBuild.plistUrl}`;
+              const ipaDirectUrl = `${parsed.ipaFilename}`;
+              const plistDirectUrl = `qr${selectedBuild.plistUrl}`;
               // Build standard QR api parameters (URL encoded)
-              const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(installUrl)}&color=00a2ff&bgcolor=0c1424`;
+              const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${getFullInstallUrl(selectedBuild.plistUrl)}`;
 
               return (
                 <motion.div 

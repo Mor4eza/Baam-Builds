@@ -87,9 +87,9 @@ export function formatBuildDate(dateStr: string): string {
       const year = parts[3];
       
       const monthMap: Record<string, string> = {
-        jan: "January", feb: "February", mar: "March", apr: "April",
-        may: "May", jun: "June", jul: "July", aug: "August",
-        sep: "September", oct: "October", nov: "November", dec: "December"
+        jan: "Jan", feb: "Feb", mar: "Mar", apr: "Apr",
+        may: "May", jun: "Jun", jul: "Jul", aug: "Aug",
+        sep: "Sep", oct: "Oct", nov: "Nov", dec: "Dec"
       };
       
       const monthFull = monthMap[monthShort.toLowerCase()] || monthShort;

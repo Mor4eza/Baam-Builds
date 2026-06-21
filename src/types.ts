@@ -3,6 +3,10 @@ export interface IOSBuild {
   title: string;
   desc: string;
   plistUrl: string;
+  version: string;
+  id: string;
+  build: number;
+
 }
 
 export interface APIResponse {
