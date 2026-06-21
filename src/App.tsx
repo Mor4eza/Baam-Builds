@@ -40,7 +40,7 @@ export default function App() {
   // UI interaction states
   const [selectedBuild, setSelectedBuild] = useState<IOSBuild | null>(null);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
-  const [showHelpAccordion, setShowHelpAccordion] = useState<boolean>(true);
+  const [showHelpAccordion, setShowHelpAccordion] = useState<boolean>(false);
   const [showConfigPanel, setShowConfigPanel] = useState<boolean>(false);
 
   // Deletion with password protection states
@@ -125,7 +125,10 @@ export default function App() {
       title: `${newVersion} ${newTitle}`,
       desc: `Download HamrahBaam_${newVersion}_${newBuild}.ipa`,
       plistUrl: newPlist || `manifest_${newVersion}_${newBuild}.plist`,
-      date: formattedDate
+      date: formattedDate,
+      version: "",
+      id: "",
+      build: 0
     };
 
     const updated = [newBuildObj, ...simulatedBuilds];
@@ -252,9 +255,9 @@ export default function App() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="flex items-center gap-3 mb-2"
         >
-          <div className="bg-sky-500/10 p-2.5 rounded-2xl border border-sky-400/20">
-            <Apple className="w-8 h-8 text-sky-400" />
-          </div>
+          
+
+           <div className="h-16 w-16 bg-[url('https://baam.bmi.ir/fa/assets/images/logos/baam/baam-fill.svg')] bg-cover bg-center"></div>
           {/* <span className="text-xs tracking-[0.3em] text-sky-400 font-bold uppercase font-mono bg-sky-950/40 px-3 py-1 rounded-full border border-sky-900/40">
             Internal Beta
           </span> */}
@@ -346,7 +349,7 @@ export default function App() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="w-full bg-[#111926]/90 border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl text-left text-sm overflow-hidden"
+              className="w-full bg-[#111926]/90 border border-slate-800 rounded-2xl p-4 mb-4 shadow-xl text-left text-sm overflow-hidden"
             >
               <h3 className="font-semibold text-slate-250 mb-3 flex items-center gap-2">
                 <Settings className="w-4 h-4 text-sky-400" />
@@ -405,6 +408,77 @@ export default function App() {
         </AnimatePresence>
       </header>
 
+{/* Expandable Help & Sideloading Guide Area */}
+        <section id="help_guide" className="relative z-10 w-full max-w-2xl px-1 mt-2 mb-8 flex-1">
+          <button 
+            onClick={() => setShowHelpAccordion(!showHelpAccordion)}
+            className="w-full bg-[#111927]/60 hover:bg-[#131d2e]/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between text-slate-300 font-medium transition-all"
+          >
+            <div className="flex items-center gap-2.5">
+              <HelpCircle className="w-5 h-5 text-sky-400" />
+              <span>iOS Beta Installing Help </span>
+            </div>
+            {showHelpAccordion ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+
+          <AnimatePresence>
+            {showHelpAccordion && (
+              <motion.div
+                initial={{ opacity: 0, y: -5, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -5, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="bg-[#111927]/30 border-x border-b border-slate-800 rounded-b-2xl p-6 space-y-5 text-xs sm:text-sm text-slate-400 leading-relaxed text-left">
+                  
+                  {/* Step 1 */}
+                  <div className="flex gap-3">
+                    <div className="w-6 h-6 rounded-full bg-sky-500/10 text-sky-400 font-bold flex items-center justify-center font-mono flex-shrink-0 text-xs">
+                      1
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-200 mb-1">Open Link on safari</h4>
+                      <p>
+                        OTA (Over-the-Air) iOS distribution uses custom service schemas. Apple requires you to touch these buttons from native browsers (preferably <strong>Safari browser</strong>). Third party app frames or custom chrome sandboxes may block native installation prompts.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="flex gap-3">
+                    <div className="w-6 h-6 rounded-full bg-sky-500/10 text-sky-400 font-bold flex items-center justify-center font-mono flex-shrink-0 text-xs">
+                      2
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-200 mb-1">Trust Provision Profile</h4>
+                      <p>
+                        To load any corporate enterprise beta profile, you must trust the developer. If you click Install, nothing visual may seem to happen in the background immediately, but iOS is downloading the file. After an icon appears on your home screen, go to:
+                      </p>
+                      <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-850 font-mono text-center text-slate-300 my-2 text-xs select-text">
+                        Settings → General → VPN & Device Management → Select Developer Profiler & click "Trust"
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex gap-3">
+                    <div className="w-6 h-6 rounded-full bg-sky-500/10 text-sky-400 font-bold flex items-center justify-center font-mono flex-shrink-0 text-xs">
+                      3
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-200 mb-1">Desktop Sideload Testing</h4>
+                      <p>
+                        Opening this on desktop? No worries! Tap <strong>Options</strong> on any build block to trigger custom QR Codes. Frame your iPhone camera to snap the QR and install instantly without typing lengthy URLs or syncing cable bridges.
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+
       {/* Main Content Area */}
       <main className="relative z-10 w-full max-w-2xl px-1 flex-1">
         
@@ -440,13 +514,19 @@ export default function App() {
                       "date": "Tue 21 Oct 2025 16:14",
                       "title": "4.6.4 Regression",
                       "desc": "Download HamrahBaam_4.6.4_b1-develop.ipa",
-                      "plistUrl": "manifest_4.6.4_b1-develop.plist"
+                      "plistUrl": "manifest_4.6.4_b1-develop.plist",
+                      "version": "4.6.4",
+                      "id": "4.6.4_b1-develop",
+                      "build": 1
                     },
                     {
                       "date": "Wed 22 Oct 2025 14:50",
                       "title": "Regression V4.6.4 B2",
                       "desc": "Download HamrahBaam_4.6.4_b2-develop.ipa",
-                      "plistUrl": "manifest_4.6.4_b2-develop.plist"
+                      "plistUrl": "manifest_4.6.4_b2-develop.plist",
+                      "version": "4.6.4",
+                      "id": "4.6.4_b2-develop",
+                      "build": 2
                     }
                   ].reverse());
                   setError(null);
@@ -537,9 +617,9 @@ export default function App() {
 
                       {/* Right calendar & delete elements */}
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center text-sm text-slate-400 bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-xl font-medium gap-1.5">
+                        <div className="flex items-center text-sm text-slate-400 bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-xl font-medium gap-1">
                           <Calendar className="w-4 h-4 text-sky-400/70" />
-                          <span className="hidden xs:inline">{formatBuildDate(build.date)}</span>
+                          <span className="hidden xs:inline text-xs">{formatBuildDate(build.date)}</span>
                           <span className="inline xs:hidden text-xs">{build.date.split(" ")[1] || ""} {build.date.split(" ")[2] || ""}</span>
                         </div>
 
@@ -589,77 +669,6 @@ export default function App() {
 
           </div>
         )}
-
-        {/* Expandable Help & Sideloading Guide Area */}
-        <section id="help_guide" className="mt-8 mb-16 relative">
-          <button 
-            onClick={() => setShowHelpAccordion(!showHelpAccordion)}
-            className="w-full bg-[#111927]/60 hover:bg-[#131d2e]/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between text-slate-300 font-medium transition-all"
-          >
-            <div className="flex items-center gap-2.5">
-              <HelpCircle className="w-5 h-5 text-sky-400" />
-              <span>iOS Beta Installing Help & Troubleshooting Guide</span>
-            </div>
-            {showHelpAccordion ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-          </button>
-
-          <AnimatePresence>
-            {showHelpAccordion && (
-              <motion.div
-                initial={{ opacity: 0, y: -5, height: 0 }}
-                animate={{ opacity: 1, y: 0, height: "auto" }}
-                exit={{ opacity: 0, y: -5, height: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="bg-[#111927]/30 border-x border-b border-slate-800 rounded-b-2xl p-6 space-y-5 text-xs sm:text-sm text-slate-400 leading-relaxed text-left">
-                  
-                  {/* Step 1 */}
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-sky-500/10 text-sky-400 font-bold flex items-center justify-center font-mono flex-shrink-0 text-xs">
-                      1
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200 mb-1">Open Link on safari</h4>
-                      <p>
-                        OTA (Over-the-Air) iOS distribution uses custom service schemas. Apple requires you to touch these buttons from native browsers (preferably <strong>Safari browser</strong>). Third party app frames or custom chrome sandboxes may block native installation prompts.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Step 2 */}
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-sky-500/10 text-sky-400 font-bold flex items-center justify-center font-mono flex-shrink-0 text-xs">
-                      2
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200 mb-1">Trust Provision Profile</h4>
-                      <p>
-                        To load any corporate enterprise beta profile, you must trust the developer. If you click Install, nothing visual may seem to happen in the background immediately, but iOS is downloading the file. After an icon appears on your home screen, go to:
-                      </p>
-                      <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-850 font-mono text-center text-slate-300 my-2 text-xs select-text">
-                        Settings → General → VPN & Device Management → Select Developer Profiler & click "Trust"
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Step 3 */}
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-sky-500/10 text-sky-400 font-bold flex items-center justify-center font-mono flex-shrink-0 text-xs">
-                      3
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200 mb-1">Desktop Sideload Testing</h4>
-                      <p>
-                        Opening this on desktop? No worries! Tap <strong>Options</strong> on any build block to trigger custom QR Codes. Frame your iPhone camera to snap the QR and install instantly without typing lengthy URLs or syncing cable bridges.
-                      </p>
-                    </div>
-                  </div>
-
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
       </main>
 
       {/* FOOTER */}
