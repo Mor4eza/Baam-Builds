@@ -157,9 +157,9 @@ export default function App() {
     if (e) {
       e.preventDefault();
     }
-    if (deletePassword === "iosbaam" || "iostester") {
+    if (deletePassword === "iosbaam" || deletePassword === "iostester") {
       if (!pendingDeleteBuild) return;
-
+      console.log(deletePassword)
       setDeleteLoading(true);
       setDeletePasswordError(null);
 
